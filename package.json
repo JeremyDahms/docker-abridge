@@ -12,6 +12,7 @@
 		"@oclif/config": "^1.13.3",
 		"@oclif/plugin-help": "^2.2.3",
 		"@oclif/plugin-not-found": "^1.2.3",
+		"@oclif/plugin-plugins": "^1.10.1",
 		"chalk": "^2.0.0",
 		"execa": "^4.0.0",
 		"execa-output": "^2.0.0",
@@ -52,7 +53,8 @@
 		"bin": "docker-abridge",
 		"plugins": [
 			"@oclif/plugin-help",
-			"@oclif/plugin-not-found"
+			"@oclif/plugin-not-found",
+			"@oclif/plugin-plugins"
 		]
 	},
 	"repository": "benhorblit/docker-abridge",

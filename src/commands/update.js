@@ -8,7 +8,7 @@ const Listr = require("listr");
 const { Observable } = require("rxjs");
 const { first, last } = require("rxjs/operators");
 const { getServiceDefinition, getServiceConfig, pathFromBase } = require("../utils/compose-config");
-const { activateServices, updateDeployment } = require("../utils/compose-utils");
+const { modifyServices, updateDeployment } = require("../utils/compose-utils");
 
 class Update extends Command {
   static strict = false;
@@ -28,7 +28,7 @@ pulling the latest image from the remote repository.
 By default 2 service images will be updated at a time. The deployment will 
 be updated, if it is running, once all images have been built.`;
 
-  static args = [{ name: "services...", description: "The names services to update" }];
+static args = [{ name: "services...", description: "The names services to update" }];
 
   static flags = {
     verbose: flags.boolean({
@@ -65,7 +65,7 @@ be updated, if it is running, once all images have been built.`;
                   {
                     title: "Pull image from remote",
                     task: () => {
-                      activateServices([serviceName]);
+                      modifyServices({ enable: [serviceName] });
                       const pullObservable = execao("docker", [
                         "pull",
                         getServiceDefinition(serviceName).image,
@@ -89,8 +89,8 @@ be updated, if it is running, once all images have been built.`;
                       task: () => {
                         const [buildCommand, ...buildArgs] = abridgeConfig.build;
                         const buildObservable = execao(buildCommand, buildArgs, {
-                          cwd: pathFromBase(abridgeConfig.context),
-                        });
+                            cwd: pathFromBase(abridgeConfig.context),
+                          });
                         buildObservable.pipe(first()).subscribe(() => {
                           // eslint-disable-next-line no-param-reassign
                           task.title = `Updating ${chalk.bold.yellow(serviceName)}`;
@@ -121,7 +121,7 @@ be updated, if it is running, once all images have been built.`;
                     {
                       title: "Build image",
                       task: () => {
-                        activateServices([serviceName]);
+                        modifyServices({ enable: [serviceName] });
                         const imageBuildObservable = execao(
                           "docker-compose",
                           ["build", serviceName],
@@ -139,7 +139,9 @@ be updated, if it is running, once all images have been built.`;
                   ],
                   {
                     exitOnError: true,
-                    renderer: verbose ? require("listr-verbose-renderer") : undefined,
+                    renderer: verbose
+                      ? require("listr-verbose-renderer")
+                      : undefined,
                   }
                 );
           },
